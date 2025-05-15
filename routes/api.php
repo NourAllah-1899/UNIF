@@ -21,16 +21,13 @@ use App\Http\Controllers\API\{
     BudgetController,
     ExpencesController
 };
-use App\Http\Controllers\{
-    TransactionsController
 
-};
 
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/user', [UserController::class, 'show']);
     Route::put('/user', [UserController::class, 'update']);
-    Route::apiResource('transactions', TransactionsController::class)->except(['update']);    
+    Route::apiResource('transactions', TransactionController::class)->except(['update']);    
     Route::apiResource('categories', CategoryController::class)->only(['index', 'store']);
     Route::apiResource('cards', CardController::class)->only(['index', 'store', 'destroy']);
     Route::apiResource('budgets', BudgetController::class);    

@@ -23,23 +23,23 @@ class TransactionsController extends Controller
         $summary = DB::table('transactions')
             ->where('user_id', Auth::id())
             ->where('status', 'completed')
-            // ->selectRaw('
-            //     SUM(CASE WHEN type = "income" THEN value ELSE 0 END) as income,
-            //     SUM(CASE WHEN type = "expense" THEN value ELSE 0 END) as expense,
-            //     SUM(CASE WHEN type = "income" THEN value ELSE -value END) as balance
-            // ')
-            // ->first();
+            ->selectRaw('
+                SUM(CASE WHEN type = "income" THEN amount ELSE 0 END) as income,
+                SUM(CASE WHEN type = "expense" THEN amount ELSE 0 END) as expense,
+                SUM(CASE WHEN type = "income" THEN amount ELSE -amount END) as balance
+            ')
+            ->first();
 
-        // return Inertia::render('Transaction', [ // Exactly matches your folder/file
-        //     'transactions' => $transactions,
-        //     'filters' => $request->all(['type', 'status', 'filter']),
-        //     'summary' => [
-        //         'balance' => $summary->balance ?? 0,
-        //         'income' => $summary->income ?? 0,
-        //         'expense' => $summary->expense ?? 0,
-        //     ],
-        //     'message' => session('message'),
-        // ]);
+        return Inertia::render('Transaction', [ // Exactly matches your folder/file
+            'transactions' => $transactions,
+            'filters' => $request->all(['type', 'status', 'filter']),
+            'summary' => [
+                'balance' => $summary->balance ?? 0,
+                'income' => $summary->income ?? 0,
+                'expense' => $summary->expense ?? 0,
+            ],
+            'message' => session('message'),
+        ]);
     ;}
 
     public function create()
@@ -70,13 +70,13 @@ class TransactionsController extends Controller
             'date' => 'required|date',
             'type' => 'required|in:income,expense',
             'name' => 'required|string|max:255',
-            'value' => 'required|numeric|min:0.01',
+            'amount' => 'required|numeric|min:0.01',
             'status' => 'required|in:completed,pending,failed',
             'category_id' => 'nullable|exists:categories,id',
         ]);
 
         $transaction->update($request->only([
-            'date', 'type', 'name', 'value',
+            'date', 'type', 'name', 'amount',
             'status', 'category_id', 'notes'
         ]));
 
